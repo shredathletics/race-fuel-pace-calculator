@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Race Fuel & Pace Calculator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            display: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        .fueling-plan {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f4f8;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Race Fuel & Pace Calculator</h1>
+        
+        <div class="input-group">
+            <label for="raceType">Race Type:</label>
+            <select id="raceType">
+                <option value="half">Half Marathon</option>
+                <option value="full">Marathon</option>
+            </select>
+
+            <label for="goalTime">Goal Time (HH:MM:SS):</label>
+            <input type="text" id="goalTime" placeholder="01:30:00">
+
+            <label for="weight">Weight (kg):</label>
+            <input type="number" id="weight" placeholder="70">
+
+            <button onclick="calculate()">Calculate</button>
+        </div>
+
+        <div id="results" class="results">
+            <h2>Your Race Plan</h2>
+            
+            <h3>Pacing Strategy</h3>
+            <table id="paceTable">
+                <thead>
+                    <tr>
+                        <th>Split</th>
+                        <th>Target Time</th>
+                        <th>Pace (min/km)</th>
+                    </tr>
+                </thead>
+                <tbody id="paceTableBody">
+                </tbody>
+            </table>
+
+            <div class="fueling-plan">
+                <h3>Fueling Strategy</h3>
+                <div id="fuelingPlan"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            const raceType = document.getElementById('raceType').value;
+            const goalTime = document.getElementById('goalTime').value;
+            const weight = parseFloat(document.getElementById('weight').value);
+
+            if (!goalTime || !weight) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            // Parse goal time
+            const [hours, minutes, seconds] = goalTime.split(':').map(Number);
+            const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+            const totalMinutes = totalSeconds / 60;
+
+            // Calculate pace
+            const distance = raceType === 'half' ? 21.1 : 42.2;
+            const pacePerKm = totalMinutes / distance;
+
+            // Generate splits
+            const splits = raceType === 'half' ? 
+                [5, 10, 15, 20] : 
+                [10, 21.1, 30, 40];
+
+            // Update pace table
+            const tableBody = document.getElementById('paceTableBody');
+            tableBody.innerHTML = '';
+            
+            splits.forEach(split => {
+                const splitTime = (split * pacePerKm).toFixed(2);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${split} km</td>
+                    <td>${formatTime(splitTime)}</td>
+                    <td>${pacePerKm.toFixed(2)}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            // Calculate fueling plan
+            const fuelingPlan = document.getElementById('fuelingPlan');
+            const carbsPerHour = totalMinutes > 150 ? 60 : totalMinutes > 90 ? 45 : 30;
+            const totalCarbs = Math.ceil((totalMinutes / 60) * carbsPerHour);
+            
+            fuelingPlan.innerHTML = `
+                <p><strong>Total Race Duration:</strong> ${formatTime(totalMinutes)}</p>
+                <p><strong>Carbohydrate Intake:</strong> ${carbsPerHour}g per hour (${totalCarbs}g total)</p>
+                <p><strong>Fluid Intake:</strong> ${totalMinutes > 150 ? '600' : totalMinutes > 90 ? '500' : '400'}ml per hour</p>
+                <p><strong>Pre-Race (3-4 hours before):</strong> ${Math.round(weight * 1.5)}g carbs</p>
+                <p><strong>Final Top-Up (1 hour before):</strong> ${Math.round(weight * 0.5)}g carbs</p>
+            `;
+
+            // Show results
+            document.getElementById('results').style.display = 'block';
+        }
+
+        function formatTime(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = Math.floor(minutes % 60);
+            const secs = Math.round((minutes % 1) * 60);
+            return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+    </script>
+</body>
+</html> 
