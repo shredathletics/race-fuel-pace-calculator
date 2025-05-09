@@ -1,16 +1,16 @@
 # Race Fuel & Pace Calculator
 
-An interactive web-based calculator that helps runners plan their race day strategy, including pacing and fueling recommendations.
+An interactive web-based calculator that helps runners plan their race day strategy, including pacing and fuelling recommendations.
 
 ## Features
 
 - **Pacing Strategy Calculator**
   - Supports both Half Marathon and Marathon distances
   - Calculates split times at key checkpoints
-  - Shows target pace per kilometer
+  - Shows target pace per kilometre
 
-- **Fueling Plan Generator**
-  - Personalized carbohydrate intake recommendations
+- **Fuelling Plan Generator**
+  - Personalised carbohydrate intake recommendations
   - Fluid intake calculations
   - Pre-race nutrition targets
   - Adjusts recommendations based on race duration
