@@ -24,7 +24,7 @@ An interactive web-based calculator that helps runners plan their race day strat
 
 ## Live Demo
 
-Try the calculator: [Race Fuel & Pace Calculator](https://shredathletics.github.io/race-fuel-pace-calculator/)
+Try the calculator: [Race Fuel & Pace Calculator](https://shredathletics.github.io/race-fuel-pace-calculator/index.html)
 
 ## Technical Details
 
